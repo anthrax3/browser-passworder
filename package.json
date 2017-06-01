@@ -28,5 +28,8 @@
   "homepage": "https://github.com/flyswatter/browser-encryptor#readme",
   "dependencies": {
     "browserify-unibabel": "^3.0.0"
+  },
+  "devDependencies": {
+    "browserify": "^14.4.0"
   }
 }

@@ -86,7 +86,6 @@ function keyFromPassword (password, salt) {
     false,
     ['deriveBits', 'deriveKey']
   ).then(function (key) {
-
     return global.crypto.subtle.deriveKey(
       { name: 'PBKDF2',
         salt: saltBuffer,
@@ -98,6 +97,28 @@ function keyFromPassword (password, salt) {
       false,
       ['encrypt', 'decrypt']
     )
+  }).catch(function (err) {
+    if (err.message.includes('pbkdf2') && global.asmCrypto) {
+      try {
+        const key = global.asmCrypto.PBKDF2_HMAC_SHA256.bytes(
+          passBuffer,
+          saltBuffer,
+          10000,
+          32
+        )
+        return global.crypto.subtle.importKey(
+          'raw',
+          key,
+          { name: 'AES-GCM', length: 256 },
+          false,
+          ['encrypt', 'decrypt']
+        )
+      } catch (err) {
+        return Promise.reject(err)
+      }
+    } else {
+      return Promise.reject(err)
+    }
   })
 }
 
